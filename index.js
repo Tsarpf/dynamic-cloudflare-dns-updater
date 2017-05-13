@@ -53,5 +53,5 @@ function update() {
               })))
          )
     .then(() => console.log('done!'))
-    .catch(e => console.log(e))
+    .catch(e => console.log(`Error! ${e}`))
 }
