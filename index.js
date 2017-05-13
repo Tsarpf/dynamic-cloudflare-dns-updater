@@ -25,6 +25,7 @@ instance.get('/zones', {name: conf.domain})
     zoneId = result[0].id
     return instance.get(`/zones/${zoneId}/dns_records`)
   })
+  .then((conf.newAddress ? Promise.resolve(conf.newAddress) : require('public-ip').v4())
   .then(e =>
         Promise.all(
           e.data.result
