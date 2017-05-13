@@ -24,7 +24,7 @@ function update() {
   console.log(`updating ${conf.domain} records`)
   let zoneId
   let newAddress
-  return (conf.newAddress ? Promise.resolve(conf.newAddress) : require('public-ip').v4())
+  return (process.env.IP_ADDRESS ? Promise.resolve(process.env.IP_ADDRESS) : conf.ipAddress ? Promise.resolve(conf.ipAddress) : require('public-ip').v4())
     .then(address => {
       newAddress = address
       console.log(`using ip address ${newAddress}`)
