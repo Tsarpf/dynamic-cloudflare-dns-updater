@@ -1,5 +1,5 @@
-Dynamic cloudflare dns updater
-Updates all IPs for a zone/domain on cloudflare to your public ip address or address set in config
+# Dynamic cloudflare dns updater
+Updates *all* IPs for a zone/domain on cloudflare to your public ip address or address set in config
 
 ## Before running:
 - copy `settings/settings.json.example` to `settings/settings.json`
