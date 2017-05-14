@@ -3,8 +3,8 @@ const Promise = require('bluebird')
 const conf = require('./settings/settings.json')
 const ipv4 = require('public-ip').v4
 
-const domain = process.env.TARGERT_DOMAIN ? process.env.TARGERT_DOMAIN
-                                          : conf.domain
+const domain = process.env.TARGET_DOMAIN ? process.env.TARGET_DOMAIN
+                                         : conf.domain
 
 const updateInterval = process.env.UPDATE_INTERVAL_MS ? process.env.UPDATE_INTERVAL_MS
                                                       : conf.updateInterval
