@@ -1,57 +1,68 @@
 const axios = require('axios')
 const Promise = require('bluebird')
 const conf = require('./settings/settings.json')
+const ipv4 = require('public-ip').v4
+
+const domain = process.env.TARGERT_DOMAIN ? process.env.TARGERT_DOMAIN
+                                          : conf.domain
+
+const updateInterval = process.env.UPDATE_INTERVAL_MS ? process.env.UPDATE_INTERVAL_MS
+                                                      : conf.updateInterval
+
+const getIpAddress = () => process.env.IP_ADDRESS ? Promise.resolve(process.env.IP_ADDRESS)
+                                                  : conf.ipAddress ? Promise.resolve(conf.ipAddress)
+                                                                   : ipv4()
 
 const instance = axios.create({
   baseURL: 'https://api.cloudflare.com/client/v4',
   headers: {
-    'X-Auth-Email': conf.email,
-    'X-Auth-Key': conf.authKey,
+    'X-Auth-Email': process.env.EMAIL ? process.env.EMAIL : conf.email,
+    'X-Auth-Key': process.env.AUTH_KEY ? process.env.AUTH_KEY : conf.authKey,
     'Content-Type': 'application/json'
   }
 })
 
-if (conf.updateInterval) {
-  update().then(_ => console.log(`sleeping for ${conf.updateInterval / 1000 / 60} minutes`))
-  setInterval(() =>
-              update().then(_ => console.log(`sleeping for ${conf.updateInterval / 1000 / 60} minutes`)),
-              parseInt(conf.updateInterval))
-} else {
-  update()
-}
-
 function update() {
-  console.log(`updating ${conf.domain} records`)
+  console.log(`updating ${domain} records`)
   let zoneId
-  let newAddress
-  return (process.env.IP_ADDRESS ? Promise.resolve(process.env.IP_ADDRESS) : conf.ipAddress ? Promise.resolve(conf.ipAddress) : require('public-ip').v4())
-    .then(address => {
-      newAddress = address
-      console.log(`using ip address ${newAddress}`)
-    })
-    .then(_ => instance.get('/zones', {name: conf.domain}))
-    .then(e => {
-      const result = e.data.result.filter(z => z.name === conf.domain)
+  let ipAddress
 
-      if (result.length > 1) {
-        console.log('warning! more than one zone was found with the given domain, only updating first one')
-      } else if (result.length === 0) {
-        throw 'no zone found with given domain'
-      }
+  return getIpAddress().then(address => {
+    ipAddress = address
+    console.log(`using ip address ${ipAddress}`)
+  })
+  .then(_ => instance.get('/zones', {name: domain}))
+  .then(e => {
+    const zones = e.data.result.filter(z => z.name === domain)
 
-      zoneId = result[0].id
-      return instance.get(`/zones/${zoneId}/dns_records`)
-    })
-    .then(e =>
-          Promise.all(
-            e.data.result
-              .filter(item => item.type === 'A')
-              .map(item => instance.put(`/zones/${zoneId}/dns_records/${item.id}`, {
-                type: item.type,
-                name: item.name,
-                content: newAddress
-              })))
-         )
-    .then(() => console.log('done!'))
-    .catch(e => console.log(`Error! ${e}`))
+    if (zones.length > 1) {
+      console.log('warning! more than one zone found, only updating first one')
+    } else if (zones.length === 0) {
+      throw 'no zone found with given domain'
+    }
+
+    zoneId = zones[0].id
+    return instance.get(`/zones/${zoneId}/dns_records`)
+  })
+  .then(e =>
+        Promise.all(
+          e.data.result
+            .filter(item => item.type === 'A')
+            .map(item => instance.put(`/zones/${zoneId}/dns_records/${item.id}`, {
+              type: item.type,
+              name: item.name,
+              content: ipAddress
+            })))
+        )
+  .then(() => console.log('done!'))
+  .catch(e => console.log(`Error! ${e}`))
 }
+
+function updatePeriodic() {
+  update().then(_ => console.log(`sleeping for ${updateInterval / 1000 / 60} minutes`))
+          .catch(e => console.log(`Error! ${e}`))
+}
+
+// If no updateInterval set, just run once and exit
+updateInterval ? updatePeriodic() || setInterval(updatePeriodic, parseInt(updateInterval))
+               : update()
