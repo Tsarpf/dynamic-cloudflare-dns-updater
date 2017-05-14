@@ -1,6 +1,12 @@
 const axios = require('axios')
 const Promise = require('bluebird')
-const conf = require('./settings/settings.json')
+const conf = {
+  "email": process.env.CLOUDFLARE_EMAIL_ADDRESS,
+  "authKey": process.env.CLOUDFLARE_GLOBAL_API_KEY,
+  "newAddress": process.env.NEW_ADDRESS,
+  "domain": process.env.DOMAIN,
+  "updateInterval": process.env.UPDATE_INTERVAL || 1800000
+}
 
 const instance = axios.create({
   baseURL: 'https://api.cloudflare.com/client/v4',

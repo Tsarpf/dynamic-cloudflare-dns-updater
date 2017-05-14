@@ -1,7 +1,0 @@
-{
-  "email": "YOUR_CLOUDFLARE_EMAIL_ADDRESS",
-  "authKey": "YOUR_GLOBAL_API_KEY_FROM_CLOUDFLARE_ACCOUNT_SETTINGS",
-  "newAddress": "",
-  "domain": "example.com",
-  "updateInterval": "1800000"
-}
