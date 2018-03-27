@@ -2,11 +2,16 @@
 Updates *all* IPs for a zone/domain on cloudflare to your public ip address or address set in config
 
 ## Before running:
-- copy `settings/settings.json.example` to `settings/settings.json`
-- type in the settings
-    * leave `newAddress` blank to automatically try to use your public IP (no guarantees!)
-    * give `IP_ADDRESS` as an environment variable to node to override settings.json ip address AND public ip (for example for running the program periodically while getting the ip address from somewhere else)
-    * clear `updateInterval` field completely to run only once
+* leave `newAddress` blank to automatically use your public IP (no guarantees it's the correct one!)
+* Leave `updateInterval` field blank to run just once
+* Environment variables override other settings if both are set
+- With environment variables, set:
+   * `TARGET_DOMAIN=http://example.com`
+   * `UPDATE_INTERVAL_MS=900000`
+   * `IP_ADDRESS=127.0.0.1`
+   * `EMAIL=your.cloudflare@email.com`
+   * `AUTH_KEY=your_global_api_key_from_cloudflare_settings`
+- OR copy `settings/settings.json.example` to `settings/settings.json` and type in the settings there
 
 ## Running
 ### If you have Docker
