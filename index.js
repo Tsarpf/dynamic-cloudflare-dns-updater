@@ -21,7 +21,7 @@ if (conf.updateInterval) {
 }
 
 function update() {
-  console.log(`updating ${conf.domain} records`)
+  console.log(`updating ${conf.domain} records ${new Date()}`)
   let zoneId
   let newAddress
   return (process.env.IP_ADDRESS ? Promise.resolve(process.env.IP_ADDRESS) : conf.ipAddress ? Promise.resolve(conf.ipAddress) : require('public-ip').v4())
@@ -53,5 +53,5 @@ function update() {
               })))
          )
     .then(() => console.log('done!'))
-    .catch(e => console.log(`Error! ${e}`))
+    .catch(e => console.log(`Error! ${e} ${new Date()}`))
 }
