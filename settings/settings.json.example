@@ -4,4 +4,5 @@
   "ipAddress": "",
   "domain": "example.com",
   "updateInterval": "1800000"
+  "ignoreList": ["somesubdomain.example.com"]
 }
