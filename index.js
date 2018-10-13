@@ -47,7 +47,7 @@ function update() {
   .then(e =>
         Promise.all(
           e.data.result
-            .filter(item => item.type === 'A')
+            .filter(item => item.type === 'A' && !conf.ignoreList.includes(item.name))
             .map(item => instance.put(`/zones/${zoneId}/dns_records/${item.id}`, {
               type: item.type,
               name: item.name,
